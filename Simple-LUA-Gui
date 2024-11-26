@@ -1,0 +1,10 @@
+-- Create a ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui -- Parent to CoreGui when using an executor
+
+-- Create a Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.3, 0, 0.3, 0) -- 30% of the screen width and height
+frame.Position = UDim2.new(0.35, 0, 0.35, 0) -- Centered on the screen
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black color
+frame.Parent = screenGui
