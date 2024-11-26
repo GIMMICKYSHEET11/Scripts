@@ -1,10 +1,120 @@
 -- Create a ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.CoreGui -- Parent to CoreGui when using an executor
+screenGui.Parent = game.CoreGui
 
--- Create a Frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0.3, 0, 0.3, 0) -- 30% of the screen width and height
-frame.Position = UDim2.new(0.35, 0, 0.35, 0) -- Centered on the screen
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Black color
-frame.Parent = screenGui
+-- Create a Frame for the main GUI
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0.4, 0, 0.5, 0)
+mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Create a Toggle Button to open/close the GUI
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+toggleButton.Position = UDim2.new(0.35, 0, 0, 0)
+toggleButton.Text = "Toggle GUI"
+toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+toggleButton.Parent = mainFrame
+
+-- Function to toggle visibility
+local function toggleVisibility()
+    mainFrame.Visible = not mainFrame.Visible
+end
+
+toggleButton.MouseButton1Click:Connect(toggleVisibility)
+
+-- Speed Edit Section
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(1, 0, 0.1, 0)
+speedLabel.Position = UDim2.new(0, 0, 0.1, 0)
+speedLabel.Text = "Speed:"
+speedLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+speedLabel.Parent = mainFrame
+
+local speedInput = Instance.new("TextBox")
+speedInput.Size = UDim2.new(0.5, 0, 0.1, 0)
+speedInput.Position = UDim2.new(0, 0, 0.2, 0)
+speedInput.PlaceholderText = "Set Speed"
+speedInput.Parent = mainFrame
+
+local setSpeedButton = Instance.new("TextButton")
+setSpeedButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setSpeedButton.Position = UDim2.new(0.5, 0, 0.2, 0)
+setSpeedButton.Text = "Set Speed"
+setSpeedButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+setSpeedButton.Parent = mainFrame
+
+setSpeedButton.MouseButton1Click:Connect(function()
+    local speedValue = tonumber(speedInput.Text)
+    if speedValue then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+    end
+end)
+
+-- Jump Power Edit Section
+local jumpLabel = Instance.new("TextLabel")
+jumpLabel.Size = UDim2.new(1, 0, 0.1, 0)
+jumpLabel.Position = UDim2.new(0, 0, 0.4, 0)
+jumpLabel.Text = "Jump Power:"
+jumpLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+jumpLabel.Parent = mainFrame
+
+local jumpInput = Instance.new("TextBox")
+jumpInput.Size = UDim2.new(0.5, 0, 0.1, 0)
+jumpInput.Position = UDim2.new(0, 0, 0.5, 0)
+jumpInput.PlaceholderText = "Set Jump Power"
+jumpInput.Parent = mainFrame
+
+local setJumpButton = Instance.new("TextButton")
+setJumpButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setJumpButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+setJumpButton.Text = "Set Jump"
+setJumpButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+setJumpButton.Parent = mainFrame
+
+setJumpButton.MouseButton1Click:Connect(function()
+    local jumpValue = tonumber(jumpInput.Text)
+    if jumpValue then
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = jumpValue
+    end
+end)
+
+-- ESP Toggle Section
+local espToggleLabel = Instance.new("TextLabel")
+espToggleLabel.Size = UDim2.new(1, 0, 0.1, 0)
+espToggleLabel.Position = UDim2.new(0, 0, 0.7, 0)
+espToggleLabel.Text = "Toggle ESP"
+espToggleLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+espToggleLabel.Parent = mainFrame
+
+local espToggleButton = Instance.new("TextButton")
+espToggleButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+espToggleButton.Position = UDim2.new(0.5, 0, 0.7, 0)
+espToggleButton.Text = "Toggle ESP"
+espToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+espToggleButton.Parent = mainFrame
+
+local espEnabled = false
+
+espToggleButton.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+
+    if espEnabled then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local highlight = Instance.new("Highlight")
+                highlight.Adornee = player.Character
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.Parent = player.Character
+            end
+        end
+    else
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character:FindFirstChild("Highlight") then
+                player.Character.Highlight:Destroy()
+            end
+        end
+    end
+end)
