@@ -275,29 +275,27 @@ flySpeedInput.PlaceholderText = "Fly Speed"
 flySpeedInput.Position = UDim2.new(0.35, 0, 0.5, 0)
 flySpeedInput.Parent = flyFrame
 
+local bodyVelocity = Instance.new("BodyVelocity")
+bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+
 flyButton.MouseButton1Click:Connect(function()
     flyEnabled = not flyEnabled
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    
-    if flyEnabled then
-        local bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-        bodyVelocity.Parent = humanoidRootPart
 
+    if flyEnabled then
+        bodyVelocity.Parent = humanoidRootPart
         local flySpeed = tonumber(flySpeedInput.Text) or 50 -- Default speed if not set
         while flyEnabled do
             wait()
-            local direction = humanoidRootPart.CFrame.LookVector
+            local camera = game.Workspace.CurrentCamera
+            local direction = camera.CFrame.LookVector
             bodyVelocity.Velocity = Vector3.new(direction.X, 0, direction.Z) * flySpeed
         end
-
         bodyVelocity:Destroy()
-        showConfirmation("Fly Disabled")
     else
-        showConfirmation("Fly Enabled")
+        showConfirmation("Fly Disabled")
     end
 end)
 
@@ -353,7 +351,9 @@ setSpawnButton.Parent = spawnFrame
 
 setSpawnButton.MouseButton1Click:Connect(function()
     local spawnPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    game.Workspace.SpawnLocation.Position = spawnPosition
+    local spawnLocation = Instance.new("SpawnLocation")
+    spawnLocation.Position = spawnPosition
+    spawnLocation.Parent = game.Workspace
     showConfirmation("Spawnpoint set!")
 end)
 
@@ -459,3 +459,4 @@ espToggleButton.MouseButton1Click:Connect(function()
         showConfirmation("ESP Disabled")
     end
 end)
+
