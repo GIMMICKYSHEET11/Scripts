@@ -78,6 +78,10 @@ local function showConfirmation(message)
     confirmationLabel:Destroy() -- Remove the confirmation message
 end
 
+--------------------------
+----- Adam's Script ------
+--------------------------
+
 -- Humanoid Section
 local humanoidLabel = Instance.new("TextLabel")
 humanoidLabel.Size = UDim2.new(1, 0, 0.1, 0)
@@ -215,15 +219,15 @@ flyButton.Parent = scrollingFrame
 local flyEnabled = false
 flyButton.MouseButton1Click:Connect(function()
     flyEnabled = not flyEnabled
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
     if flyEnabled then
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:WaitForChild("Humanoid")
-        
         local bodyVelocity = Instance.new("BodyVelocity")
         bodyVelocity.Velocity = Vector3.new(0, 0, 0)
         bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-        bodyVelocity.Parent = character.HumanoidRootPart
+        bodyVelocity.Parent = humanoidRootPart
 
         while flyEnabled do
             wait()
@@ -231,9 +235,8 @@ flyButton.MouseButton1Click:Connect(function()
         end
 
         bodyVelocity:Destroy()
-        showConfirmation("Fly Disabled")
     else
-        showConfirmation("Fly Enabled")
+        showConfirmation("Fly Disabled")
     end
 end)
 
@@ -348,11 +351,13 @@ espToggleButton.MouseButton1Click:Connect(function()
                 local highlight = Instance.new("Highlight")
                 highlight.Adornee = player.Character
                 highlight.FillColor = Color3.fromRGB(255, 0, 0)
+
                 local nameLabel = Instance.new("TextLabel")
                 nameLabel.Size = UDim2.new(1, 0, 0.1, 0)
                 nameLabel.Text = player.Name
                 nameLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                nameLabel.Parent = player.Character
+                nameLabel.Parent = player.Character:WaitForChild("Head")
+
                 highlight.Parent = player.Character
             end
         end
@@ -367,49 +372,18 @@ espToggleButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Loop Goto Section
-local loopGotoLabel = Instance.new("TextLabel")
-loopGotoLabel.Size = UDim2.new(1, 0, 0.1, 0)
-loopGotoLabel.Text = "🔄 Loop Goto:"
-loopGotoLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-loopGotoLabel.Parent = scrollingFrame
+-- Create Open/Close Forever Button
+local foreverButton = Instance.new("TextButton")
+foreverButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+foreverButton.Position = UDim2.new(0.9, 0, 0, 0)
+foreverButton.Text = "Open/Close"
+foreverButton.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+foreverButton.Parent = mainFrame
 
-local loopGotoButton = Instance.new("TextButton")
-loopGotoButton.Size = UDim2.new(0.3, 0, 0.1, 0)
-loopGotoButton.Text = "Start Loop"
-loopGotoButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-loopGotoButton.Parent = scrollingFrame
-
-local loopEnabled = false
-
-loopGotoButton.MouseButton1Click:Connect(function()
-    loopEnabled = not loopEnabled
-    loopGotoButton.Text = loopEnabled and "Stop Loop" or "Start Loop"
-
-    if loopEnabled then
-        while loopEnabled do
-            wait(1) -- Adjust the wait time for loop frequency
-            game.Players.LocalPlayer.Character.HumanoidRootPart.Position = Vector3.new(0, 10, 0) -- Change this to desired position
-        end
-    end
+local isOpen = true
+foreverButton.MouseButton1Click:Connect(function()
+    isOpen = not isOpen
+    mainFrame.Visible = isOpen
+    foreverButton.Text = isOpen and "Close" or "Open"
 end)
-
--- Close/Open Button Configuration
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-closeButton.Position = UDim2.new(0.9, 0, 0, 0)
-closeButton.Text = "❌"
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-closeButton.Parent = mainFrame
-
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy() -- Close the GUI
-end)
-
--- Placeholder for additional sections
-local comingSoonLabel = Instance.new("TextLabel")
-comingSoonLabel.Size = UDim2.new(1, 0, 0.1, 0)
-comingSoonLabel.Text = "Coming Soon..."
-comingSoonLabel.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-comingSoonLabel.Parent = scrollingFrame
 
