@@ -6,7 +6,7 @@ screenGui.Parent = game.CoreGui
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0.6, 0, 0.8, 0) -- Size increased to 60%
 mainFrame.Position = UDim2.new(0.2, 0, 0.1, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
@@ -37,6 +37,8 @@ local function createSectionButton(name, position)
     button.Position = position
     button.Text = name
     button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    button.Font = Enum.Font.Gotham
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Parent = sideBar
     return button
 end
@@ -46,11 +48,18 @@ for i, section in ipairs(sections) do
     sectionButtons[i] = createSectionButton(section, UDim2.new(0, 0, (i - 1) * 0.1, 0))
     sectionButtons[i].MouseButton1Click:Connect(function()
         currentSection.Text = "Current Section: " .. section
-        -- Hide all other sections
-        for _, btn in ipairs(sectionButtons) do
-            btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        -- Clear existing content
+        for _, child in ipairs(scrollingFrame:GetChildren()) do
+            if child:IsA("Frame") or child:IsA("TextLabel") or child:IsA("TextButton") then
+                child:Destroy()
+            end
         end
-        btn.BackgroundColor3 = Color3.fromRGB(150, 150, 150) -- Highlight current
+        -- Show coming soon message
+        local comingSoonLabel = Instance.new("TextLabel")
+        comingSoonLabel.Size = UDim2.new(1, 0, 0.1, 0)
+        comingSoonLabel.Text = "Coming Soon..."
+        comingSoonLabel.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        comingSoonLabel.Parent = scrollingFrame
     end)
 end
 
@@ -58,7 +67,7 @@ end
 local scrollingFrame = Instance.new("ScrollingFrame")
 scrollingFrame.Size = UDim2.new(0.8, 0, 0.9, 0)
 scrollingFrame.Position = UDim2.new(0.2, 0, 0.1, 0)
-scrollingFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 scrollingFrame.ScrollBarThickness = 10
 scrollingFrame.Parent = mainFrame
 
@@ -72,6 +81,8 @@ local function showConfirmation(message)
     confirmationLabel.Position = UDim2.new(0, 0, 0.85, 0)
     confirmationLabel.Text = message
     confirmationLabel.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    confirmationLabel.Font = Enum.Font.Gotham
+    confirmationLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
     confirmationLabel.Parent = mainFrame
 
     wait(3) -- Wait for 3 seconds
@@ -82,6 +93,22 @@ end
 ----- Adam's Script ------
 --------------------------
 
+-- Create a Hide/Unhide Button
+local hideButton = Instance.new("TextButton")
+hideButton.Size = UDim2.new(0.2, 0, 0.05, 0)
+hideButton.Position = UDim2.new(0.4, 0, 0.02, 0)
+hideButton.Text = "Hide/Unhide"
+hideButton.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+hideButton.Font = Enum.Font.Gotham
+hideButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+hideButton.Parent = mainFrame
+
+local isVisible = true
+hideButton.MouseButton1Click:Connect(function()
+    isVisible = not isVisible
+    mainFrame.Visible = isVisible
+end)
+
 -- Humanoid Section
 local humanoidLabel = Instance.new("TextLabel")
 humanoidLabel.Size = UDim2.new(1, 0, 0.1, 0)
@@ -90,22 +117,27 @@ humanoidLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 humanoidLabel.Parent = scrollingFrame
 
 -- Speed Editing
+local speedFrame = Instance.new("Frame")
+speedFrame.Size = UDim2.new(1, 0, 0.15, 0)
+speedFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+speedFrame.Parent = scrollingFrame
+
 local speedLabel = Instance.new("TextLabel")
-speedLabel.Size = UDim2.new(1, 0, 0.1, 0)
+speedLabel.Size = UDim2.new(1, 0, 0.5, 0)
 speedLabel.Text = "⚡ Speed:"
 speedLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-speedLabel.Parent = scrollingFrame
+speedLabel.Parent = speedFrame
 
 local speedInput = Instance.new("TextBox")
-speedInput.Size = UDim2.new(0.5, 0, 0.1, 0)
+speedInput.Size = UDim2.new(0.5, 0, 0.5, 0)
 speedInput.PlaceholderText = "Set Speed"
-speedInput.Parent = scrollingFrame
+speedInput.Parent = speedFrame
 
 local setSpeedButton = Instance.new("TextButton")
-setSpeedButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setSpeedButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 setSpeedButton.Text = "Edit"
 setSpeedButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-setSpeedButton.Parent = scrollingFrame
+setSpeedButton.Parent = speedFrame
 
 setSpeedButton.MouseButton1Click:Connect(function()
     local speedValue = tonumber(speedInput.Text)
@@ -116,29 +148,34 @@ setSpeedButton.MouseButton1Click:Connect(function()
 end)
 
 local currentSpeedLabel = Instance.new("TextLabel")
-currentSpeedLabel.Size = UDim2.new(0.2, 0, 0.1, 0)
-currentSpeedLabel.Position = UDim2.new(0.8, 0, 0.1, 0)
+currentSpeedLabel.Size = UDim2.new(0.2, 0, 0.5, 0)
+currentSpeedLabel.Position = UDim2.new(0.8, 0, 0, 0)
 currentSpeedLabel.Text = "Current: " .. game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
 currentSpeedLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-currentSpeedLabel.Parent = scrollingFrame
+currentSpeedLabel.Parent = speedFrame
 
 -- Jump Power Editing
+local jumpFrame = Instance.new("Frame")
+jumpFrame.Size = UDim2.new(1, 0, 0.15, 0)
+jumpFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+jumpFrame.Parent = scrollingFrame
+
 local jumpLabel = Instance.new("TextLabel")
-jumpLabel.Size = UDim2.new(1, 0, 0.1, 0)
+jumpLabel.Size = UDim2.new(1, 0, 0.5, 0)
 jumpLabel.Text = "🦘 Jump Power:"
 jumpLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-jumpLabel.Parent = scrollingFrame
+jumpLabel.Parent = jumpFrame
 
 local jumpInput = Instance.new("TextBox")
-jumpInput.Size = UDim2.new(0.5, 0, 0.1, 0)
+jumpInput.Size = UDim2.new(0.5, 0, 0.5, 0)
 jumpInput.PlaceholderText = "Set Jump Power"
-jumpInput.Parent = scrollingFrame
+jumpInput.Parent = jumpFrame
 
 local setJumpButton = Instance.new("TextButton")
-setJumpButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setJumpButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 setJumpButton.Text = "Edit"
 setJumpButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-setJumpButton.Parent = scrollingFrame
+setJumpButton.Parent = jumpFrame
 
 setJumpButton.MouseButton1Click:Connect(function()
     local jumpValue = tonumber(jumpInput.Text)
@@ -149,24 +186,29 @@ setJumpButton.MouseButton1Click:Connect(function()
 end)
 
 local currentJumpLabel = Instance.new("TextLabel")
-currentJumpLabel.Size = UDim2.new(0.2, 0, 0.1, 0)
-currentJumpLabel.Position = UDim2.new(0.8, 0, 0.2, 0)
+currentJumpLabel.Size = UDim2.new(0.2, 0, 0.5, 0)
+currentJumpLabel.Position = UDim2.new(0.8, 0, 0, 0)
 currentJumpLabel.Text = "Current: " .. game.Players.LocalPlayer.Character.Humanoid.JumpPower
 currentJumpLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-currentJumpLabel.Parent = scrollingFrame
+currentJumpLabel.Parent = jumpFrame
 
 -- Infinite Jump
+local infiniteJumpFrame = Instance.new("Frame")
+infiniteJumpFrame.Size = UDim2.new(1, 0, 0.15, 0)
+infiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+infiniteJumpFrame.Parent = scrollingFrame
+
 local infiniteJumpLabel = Instance.new("TextLabel")
-infiniteJumpLabel.Size = UDim2.new(1, 0, 0.1, 0)
+infiniteJumpLabel.Size = UDim2.new(1, 0, 0.5, 0)
 infiniteJumpLabel.Text = "♾️ Infinite Jump:"
 infiniteJumpLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-infiniteJumpLabel.Parent = scrollingFrame
+infiniteJumpLabel.Parent = infiniteJumpFrame
 
 local infiniteJumpButton = Instance.new("TextButton")
-infiniteJumpButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+infiniteJumpButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 infiniteJumpButton.Text = "Toggle"
 infiniteJumpButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-infiniteJumpButton.Parent = scrollingFrame
+infiniteJumpButton.Parent = infiniteJumpFrame
 
 local infiniteJumpEnabled = false
 infiniteJumpButton.MouseButton1Click:Connect(function()
@@ -180,17 +222,22 @@ infiniteJumpButton.MouseButton1Click:Connect(function()
 end)
 
 -- Noclip Functionality
+local noclipFrame = Instance.new("Frame")
+noclipFrame.Size = UDim2.new(1, 0, 0.15, 0)
+noclipFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+noclipFrame.Parent = scrollingFrame
+
 local noclipLabel = Instance.new("TextLabel")
-noclipLabel.Size = UDim2.new(1, 0, 0.1, 0)
+noclipLabel.Size = UDim2.new(1, 0, 0.5, 0)
 noclipLabel.Text = "🚪 Noclip:"
 noclipLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-noclipLabel.Parent = scrollingFrame
+noclipLabel.Parent = noclipFrame
 
 local noclipButton = Instance.new("TextButton")
-noclipButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+noclipButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 noclipButton.Text = "Toggle"
 noclipButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-noclipButton.Parent = scrollingFrame
+noclipButton.Parent = noclipFrame
 
 local noclipEnabled = false
 noclipButton.MouseButton1Click:Connect(function()
@@ -204,19 +251,30 @@ noclipButton.MouseButton1Click:Connect(function()
 end)
 
 -- Fly Functionality
+local flyFrame = Instance.new("Frame")
+flyFrame.Size = UDim2.new(1, 0, 0.15, 0)
+flyFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+flyFrame.Parent = scrollingFrame
+
 local flyLabel = Instance.new("TextLabel")
-flyLabel.Size = UDim2.new(1, 0, 0.1, 0)
+flyLabel.Size = UDim2.new(1, 0, 0.5, 0)
 flyLabel.Text = "✈️ Fly:"
 flyLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-flyLabel.Parent = scrollingFrame
+flyLabel.Parent = flyFrame
 
 local flyButton = Instance.new("TextButton")
-flyButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+flyButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 flyButton.Text = "Toggle"
 flyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-flyButton.Parent = scrollingFrame
+flyButton.Parent = flyFrame
 
 local flyEnabled = false
+local flySpeedInput = Instance.new("TextBox")
+flySpeedInput.Size = UDim2.new(0.5, 0, 0.5, 0)
+flySpeedInput.PlaceholderText = "Fly Speed"
+flySpeedInput.Position = UDim2.new(0.35, 0, 0.5, 0)
+flySpeedInput.Parent = flyFrame
+
 flyButton.MouseButton1Click:Connect(function()
     flyEnabled = not flyEnabled
     local player = game.Players.LocalPlayer
@@ -229,34 +287,42 @@ flyButton.MouseButton1Click:Connect(function()
         bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
         bodyVelocity.Parent = humanoidRootPart
 
+        local flySpeed = tonumber(flySpeedInput.Text) or 50 -- Default speed if not set
         while flyEnabled do
             wait()
-            bodyVelocity.Velocity = Vector3.new(0, 50, 0) -- Adjust this for vertical speed
+            local direction = humanoidRootPart.CFrame.LookVector
+            bodyVelocity.Velocity = Vector3.new(direction.X, 0, direction.Z) * flySpeed
         end
 
         bodyVelocity:Destroy()
-    else
         showConfirmation("Fly Disabled")
+    else
+        showConfirmation("Fly Enabled")
     end
 end)
 
 -- Hitbox Customizer
+local hitboxFrame = Instance.new("Frame")
+hitboxFrame.Size = UDim2.new(1, 0, 0.15, 0)
+hitboxFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+hitboxFrame.Parent = scrollingFrame
+
 local hitboxLabel = Instance.new("TextLabel")
-hitboxLabel.Size = UDim2.new(1, 0, 0.1, 0)
+hitboxLabel.Size = UDim2.new(1, 0, 0.5, 0)
 hitboxLabel.Text = "🔳 Hitbox Customizer:"
 hitboxLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-hitboxLabel.Parent = scrollingFrame
+hitboxLabel.Parent = hitboxFrame
 
 local hitboxInput = Instance.new("TextBox")
-hitboxInput.Size = UDim2.new(0.5, 0, 0.1, 0)
+hitboxInput.Size = UDim2.new(0.5, 0, 0.5, 0)
 hitboxInput.PlaceholderText = "Set Hitbox Size"
-hitboxInput.Parent = scrollingFrame
+hitboxInput.Parent = hitboxFrame
 
 local setHitboxButton = Instance.new("TextButton")
-setHitboxButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setHitboxButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 setHitboxButton.Text = "Set"
 setHitboxButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-setHitboxButton.Parent = scrollingFrame
+setHitboxButton.Parent = hitboxFrame
 
 setHitboxButton.MouseButton1Click:Connect(function()
     local hitboxSize = tonumber(hitboxInput.Text)
@@ -268,17 +334,22 @@ setHitboxButton.MouseButton1Click:Connect(function()
 end)
 
 -- Spawnpoint Setter
+local spawnFrame = Instance.new("Frame")
+spawnFrame.Size = UDim2.new(1, 0, 0.15, 0)
+spawnFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+spawnFrame.Parent = scrollingFrame
+
 local spawnLabel = Instance.new("TextLabel")
-spawnLabel.Size = UDim2.new(1, 0, 0.1, 0)
+spawnLabel.Size = UDim2.new(1, 0, 0.5, 0)
 spawnLabel.Text = "📍 Spawnpoint Setter:"
 spawnLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-spawnLabel.Parent = scrollingFrame
+spawnLabel.Parent = spawnFrame
 
 local setSpawnButton = Instance.new("TextButton")
-setSpawnButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+setSpawnButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 setSpawnButton.Text = "Set Spawn"
 setSpawnButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-setSpawnButton.Parent = scrollingFrame
+setSpawnButton.Parent = spawnFrame
 
 setSpawnButton.MouseButton1Click:Connect(function()
     local spawnPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
@@ -287,29 +358,41 @@ setSpawnButton.MouseButton1Click:Connect(function()
 end)
 
 -- Teleport to Player Section
+local teleportFrame = Instance.new("Frame")
+teleportFrame.Size = UDim2.new(1, 0, 0.15, 0)
+teleportFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+teleportFrame.Parent = scrollingFrame
+
 local teleportLabel = Instance.new("TextLabel")
-teleportLabel.Size = UDim2.new(1, 0, 0.1, 0)
+teleportLabel.Size = UDim2.new(1, 0, 0.5, 0)
 teleportLabel.Text = "🚀 Teleport to Player:"
 teleportLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-teleportLabel.Parent = scrollingFrame
+teleportLabel.Parent = teleportFrame
 
-local playerDropdown = Instance.new("TextBox")
-playerDropdown.Size = UDim2.new(0.5, 0, 0.1, 0)
-playerDropdown.PlaceholderText = "Select Player"
-playerDropdown.Parent = scrollingFrame
+local playerDropdown = Instance.new("TextButton")
+playerDropdown.Size = UDim2.new(0.5, 0, 0.5, 0)
+playerDropdown.Text = "Select Player"
+playerDropdown.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+playerDropdown.Parent = teleportFrame
 
 local teleportButton = Instance.new("TextButton")
-teleportButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+teleportButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 teleportButton.Text = "Teleport"
 teleportButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-teleportButton.Parent = scrollingFrame
+teleportButton.Parent = teleportFrame
+
+-- Populate player selection
+local function updatePlayerDropdown()
+    playerDropdown.Text = "Select Player"
+    playerDropdown.TextColor3 = Color3.fromRGB(0, 0, 0)
+end
 
 teleportButton.MouseButton1Click:Connect(function()
-    local playerName = playerDropdown.Text
-    local player = game.Players:FindFirstChild(playerName)
+    local selectedPlayer = playerDropdown.Text
+    local player = game.Players:FindFirstChild(selectedPlayer)
     if player and player.Character then
         game.Players.LocalPlayer.Character:MoveTo(player.Character.PrimaryPart.Position)
-        showConfirmation("Teleported to " .. playerName)
+        showConfirmation("Teleported to " .. selectedPlayer)
     else
         showConfirmation("Player not found!")
     end
@@ -317,28 +400,33 @@ end)
 
 -- Refresh Button for Player List
 local refreshButton = Instance.new("TextButton")
-refreshButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+refreshButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 refreshButton.Text = "Refresh Players"
 refreshButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-refreshButton.Parent = scrollingFrame
+refreshButton.Parent = teleportFrame
 
 refreshButton.MouseButton1Click:Connect(function()
-    playerDropdown.Text = "" -- Clear the input field
+    updatePlayerDropdown() -- Clear the input field
     showConfirmation("Player list refreshed!")
 end)
 
 -- ESP Functionality
+local espFrame = Instance.new("Frame")
+espFrame.Size = UDim2.new(1, 0, 0.15, 0)
+espFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+espFrame.Parent = scrollingFrame
+
 local espLabel = Instance.new("TextLabel")
-espLabel.Size = UDim2.new(1, 0, 0.1, 0)
+espLabel.Size = UDim2.new(1, 0, 0.5, 0)
 espLabel.Text = "👁️ ESP Toggle:"
 espLabel.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-espLabel.Parent = scrollingFrame
+espLabel.Parent = espFrame
 
 local espToggleButton = Instance.new("TextButton")
-espToggleButton.Size = UDim2.new(0.3, 0, 0.1, 0)
+espToggleButton.Size = UDim2.new(0.3, 0, 0.5, 0)
 espToggleButton.Text = "Toggle ESP"
 espToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-espToggleButton.Parent = scrollingFrame
+espToggleButton.Parent = espFrame
 
 local espEnabled = false
 
@@ -371,19 +459,3 @@ espToggleButton.MouseButton1Click:Connect(function()
         showConfirmation("ESP Disabled")
     end
 end)
-
--- Create Open/Close Forever Button
-local foreverButton = Instance.new("TextButton")
-foreverButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-foreverButton.Position = UDim2.new(0.9, 0, 0, 0)
-foreverButton.Text = "Open/Close"
-foreverButton.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-foreverButton.Parent = mainFrame
-
-local isOpen = true
-foreverButton.MouseButton1Click:Connect(function()
-    isOpen = not isOpen
-    mainFrame.Visible = isOpen
-    foreverButton.Text = isOpen and "Close" or "Open"
-end)
-
