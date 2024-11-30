@@ -1,58 +1,49 @@
--- Variables
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local HttpService = game:GetService("HttpService")
 
--- Create the ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AdamUniversalScriptGUI"
-screenGui.Parent = playerGui
+-- GUI Elements
+local screenGui = script.Parent
+local inputBox = screenGui.Frame.TextBox
+local submitButton = screenGui.Frame.TextButton
+local responseLabel = screenGui.Frame.TextLabel
 
--- Create the main Frame (Menu)
-local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0.5, 0, 0.7, 0)
-menuFrame.Position = UDim2.new(0.25, 0, 0.15, 0)
-menuFrame.BackgroundTransparency = 0
-menuFrame.BackgroundColor3 = Color3.new(1, 1, 1) -- White background (optional)
-menuFrame.Parent = screenGui
+-- Your OpenAI API key
+local apiKey = "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"
 
--- Add the Menu Background Image
-local menuImage = Instance.new("ImageLabel")
-menuImage.Size = UDim2.new(1, 0, 1, 0)
-menuImage.Position = UDim2.new(0, 0, 0, 0)
-menuImage.Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnOKcSkMVmUqWrl3Gc8aB2Vdjemsf3AGLUlA&usqp=CAU"
-menuImage.ScaleType = Enum.ScaleType.Stretch
-menuImage.BackgroundTransparency = 1
-menuImage.Parent = menuFrame
+local function sendMessageToAI(prompt)
+    local url = "https://api.openai.com/v1/chat/completions"
+    
+    local headers = {
+        ["Content-Type"] = "application/json",
+        ["Authorization"] = "Bearer " .. apiKey,
+    }
+    
+    local requestBody = HttpService:JSONEncode({
+        model = "gpt-3.5-turbo", -- Use the appropriate model
+        messages = {
+            {role = "user", content = prompt}
+        },
+        max_tokens = 50
+    })
+    
+    local success, response = pcall(function()
+        return HttpService:PostAsync(url, requestBody, Enum.HttpContentType.ApplicationJson, false, headers)
+    end)
+    
+    if success then
+        local responseData = HttpService:JSONDecode(response)
+        return responseData.choices[1].message.content
+    else
+        warn("Failed to get response from OpenAI:", response)
+        return "Error getting response from AI."
+    end
+end
 
--- Add a Title
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.Text = "Universal Adam's Script"
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 36
-titleLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
-titleLabel.BackgroundTransparency = 1
-titleLabel.Parent = menuFrame
+local function onSubmit()
+    local userInput = inputBox.Text
+    if userInput ~= "" then
+        local aiResponse = sendMessageToAI(userInput)
+        responseLabel.Text = aiResponse
+    end
+end
 
--- Make the Menu Scrollable
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, 0, 0.8, 0)
-scrollFrame.Position = UDim2.new(0, 0, 0.2, 0)
-scrollFrame.CanvasSize = UDim2.new(1, 0, 2, 0) -- Allow scrolling
-scrollFrame.BackgroundTransparency = 1
-scrollFrame.ScrollBarThickness = 8
-scrollFrame.Parent = menuFrame
-
--- Create the Hide/Show Icon Button
-local toggleButton = Instance.new("ImageButton")
-toggleButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-toggleButton.Position = UDim2.new(0.9, 0, 0, 0) -- Top-right corner
-toggleButton.Image = "https://static.vecteezy.com/system/resources/thumbnails/045/802/130/small_2x/shirt-buttons-isolated-on-transparent-background-png.png"
-toggleButton.BackgroundTransparency = 1
-toggleButton.Parent = screenGui
-
--- Toggle Menu Visibility
-toggleButton.MouseButton1Click:Connect(function()
-    menuFrame.Visible = not menuFrame.Visible
-end)
+submitButton.MouseButton1Click:Connect(onSubmit)
