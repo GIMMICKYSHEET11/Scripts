@@ -1,13 +1,33 @@
 local HttpService = game:GetService("HttpService")
 
--- GUI Elements
-local screenGui = script.Parent
-local inputBox = screenGui.Frame.TextBox
-local submitButton = screenGui.Frame.TextButton
-local responseLabel = screenGui.Frame.TextLabel
-
 -- Your OpenAI API key
 local apiKey = "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"
+
+-- Create GUI elements
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0.3, 0, 0.3, 0)
+frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local inputBox = Instance.new("TextBox", frame)
+inputBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+inputBox.Position = UDim2.new(0.1, 0, 0.1, 0)
+inputBox.PlaceholderText = "Type your message here"
+inputBox.Text = ""
+
+local submitButton = Instance.new("TextButton", frame)
+submitButton.Size = UDim2.new(0.8, 0, 0.2, 0)
+submitButton.Position = UDim2.new(0.1, 0, 0.35, 0)
+submitButton.Text = "Send"
+
+local responseLabel = Instance.new("TextLabel", frame)
+responseLabel.Size = UDim2.new(0.8, 0, 0.3, 0)
+responseLabel.Position = UDim2.new(0.1, 0, 0.6, 0)
+responseLabel.Text = ""
+responseLabel.TextWrapped = true
 
 local function sendMessageToAI(prompt)
     local url = "https://api.openai.com/v1/chat/completions"
